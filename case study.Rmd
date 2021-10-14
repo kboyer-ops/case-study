@@ -2,7 +2,7 @@
 title: "case study"
 author: "Kaila Boyer"
 date: "10/14/2021"
-output: github_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -91,9 +91,10 @@ nyc_airbnb %>%
 
 ## rety leaflet
 
-```{r, eval = FALSE}
+```{r}
 library(leaflet)
 
+pal = colorNumeric("viridis", NULL)
 nyc_airbnb %>% 
   filter(price < 500) %>% 
   sample_n(1000) %>% 
