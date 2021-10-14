@@ -2,7 +2,7 @@
 title: "case study"
 author: "Kaila Boyer"
 date: "10/14/2021"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -99,6 +99,13 @@ nyc_airbnb %>%
   sample_n(1000) %>% 
   leaflet() %>%  
   addTiles() %>%  
+  addMarkers(~lat, ~long) 
+
+nyc_airbnb %>% 
+  filter(price < 500) %>% 
+  sample_n(1000) %>% 
+  leaflet() %>%  
+  addProviderTiles(providers$CartoDB.Positron) %>%  
   addMarkers(~lat, ~long) 
 ```
 
