@@ -1,0 +1,105 @@
+---
+title: "case study"
+author: "Kaila Boyer"
+date: "10/14/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options( 
+  ggplot2.continuous.color = "viridis", 
+  ggplot2.continuous.fill = "viridis" ) 
+#scale_color_discrete = scale_color_viridis_d()
+#scale_fill_discrete = scale_fill_viridis_d()
+
+```
+
+```{r}
+library(tidyverse)
+library(p8105.datasets)
+```
+
+## Load Data 
+
+```{r}
+data(nyc_airbnb)
+```
+
+* is the price correlated with review score? 
+* which neighborhood is most popular? Most expensive? 
+* which neighborhood has the highest reviews? 
+* is availability related to price? 
+* is room type related to neighborhood? 
+* is length of stay related to neighborhood group (borough)? 
+
+```{r}
+
+nyc_airbnb <- 
+  nyc_airbnb %>% 
+  mutate(stars = review_scores_location / 2) %>% 
+  rename(borough = neighbourhood_group)
+
+
+nyc_airbnb %>%  
+  count(borough, room_type) %>%  
+  pivot_wider(
+    names_from = room_type, 
+    values_from = n 
+  )
+
+nyc_airbnb %>%  janitor::tabyl(borough, room_type)
+```
+
+price and room type
+```{r}
+nyc_airbnb %>%
+  ggplot(aes( x= stars, y = price)) +
+  geom_point() + 
+  facet_grid(.~ room_type)
+
+```
+
+price and neighborhood 
+```{r}
+nyc_airbnb %>% 
+  group_by(neighbourhood) %>% 
+  summarise(mean_price = mean(price, na.rm =T)) %>% 
+  arrange(mean_price)
+
+
+nyc_airbnb %>% 
+  filter(borough == "Manhattan", 
+         price <= 1000) %>%  
+  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>% 
+  ggplot(aes(x = neighbourhood, y = price)) + 
+  geom_boxplot() + 
+  coord_flip() + 
+  facet_grid(.~ room_type)
+```
+
+price vs. location 
+
+```{r}
+nyc_airbnb %>%  
+  filter(price < 500) %>% 
+  sample_n(5000) %>% 
+  ggplot(aes(x = lat, y = long, color = price)) +
+  geom_point(alpha = 0.5) 
+```
+
+## rety leaflet
+
+```{r, eval = FALSE}
+library(leaflet)
+
+nyc_airbnb %>% 
+  filter(price < 500) %>% 
+  sample_n(1000) %>% 
+  leaflet() %>%  
+  addTiles() %>%  
+  addMarkers(~lat, ~long) 
+```
+
+
